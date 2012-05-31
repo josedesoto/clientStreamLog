@@ -1,0 +1,84 @@
+{{response.files.append(URL(r=request,c='static',f='css/demo_table.css'))}}
+{{response.files.append(URL(r=request,c='static',f='js/jquery.dataTables.min.js'))}}
+
+{{extend 'layout.html'}}
+
+<p>{{=form}}</p>
+
+
+<div id="typetable"></div>
+
+
+<script>
+
+	function createStream(log_id)
+	{
+	
+		var data;
+		var oTable;
+		jQuery.getJSON('getConnectionData.json/'+log_id,
+        	function(json){
+
+
+			oTable=$('#tablelog').dataTable( {
+			"sScrollY": "600px",
+			"bPaginate": false,
+			"bScrollCollapse": true
+			});
+
+			name_log=json.name_log
+			ip=json.ip
+			port=json.port
+			expression=json.regex
+			
+			regex = new RegExp(expression);	
+
+			web2py_comet('ws://'+ip+':'+port+'/realtime/'+name_log,
+			function(e){
+				data=eval('('+oTable.fnAddData(e.data.split(regex).slice(1, -1))+')')
+	
+				});
+        		}
+		 );
+
+		
+	}
+	
+
+	function loadTable(log_id)
+
+	{
+
+		ajax('getTypeTable/'+log_id,[],'typetable')
+		
+
+	}
+
+        $("#button").click( function()
+           {
+             	var oTable;
+		oTable=$('#tablelog').dataTable( {
+		"sScrollY": "600px",
+        	"bPaginate": false,
+        	"bScrollCollapse": true
+					} );
+		oTable.fnSort( [ [0,'desc'] ] );
+
+		var params = $("input[name=radio]:checked").val();
+		
+
+		var data;
+		web2py_comet('ws://95.142.163.184:8888/realtime/'+params,
+		function(e){
+			data=eval('('+oTable.fnAddData(e.data.split(" "))+')')
+	
+		});
+
+           });
+
+  
+
+
+
+
+ </script>

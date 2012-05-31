@@ -1,0 +1,174 @@
+# -*- coding: utf-8 -*-
+# this file is released under public domain and you can use without limitations
+
+#########################################################################
+## This is a samples controller
+## - index is the default action of any application
+## - user is required for authentication and authorization
+## - download is for downloading files uploaded in the db (does streaming)
+## - call exposes all registered services (none by default)
+#########################################################################
+
+
+
+def index():
+    """
+    example action using the internationalization operator T and flash
+    rendered by views/default/index.html or views/generic.html
+    """
+    links = [lambda row:  INPUT(_type='button',_value='START STREAM', _onclick='createStream('+str(row.id)+')')]
+    form=SQLFORM.grid(db.t_log, selectable=False, csv=False,create=False, deletable=False, editable=False, links=links, user_signature=False)
+    return dict(message=T('Hello World2'), form=form)
+
+@service.json
+def getConnectionData():
+    
+    id_log=request.args[0]
+    ip=''
+    port=''
+    name_log=''
+    
+    data_connection=db((db.t_log.id==id_log)&(db.t_log.server==db.t_server.id)).select(db.t_log.name,db.t_server.IP,db.t_server.port)
+  
+    for row in data_connection:
+        ip=row.t_server.IP
+        port=row.t_server.port
+        name_log=row.t_log.name
+        
+    print ip
+    print port
+    print name_log
+    
+	return response.json({"connection": [{'name_log': 'xhtml','IP': '127.0.0.1','port': '8888'}]})
+
+def choose_log():
+    """
+    example action using the internationalization operator T and flash
+    rendered by views/default/index.html or views/generic.html
+    """
+    
+    
+    return dict(message="log")
+
+
+def getTypeTable():
+    """
+    example action using the internationalization operator T and flash
+    rendered by views/default/index.html or views/generic.html
+    """
+    table=''
+    id_log=request.args[0]
+    type_table=db((db.t_log.id==id_log)&(db.t_log.type_log==db.t_type_log.id)).select(db.t_type_log.html_table)
+    for row in type_table:
+        table=row.html_table
+        
+    '''
+    table='<table cellpadding="0" cellspacing="0" border="0" class="display" id="tablelog"> \
+    <thead> \
+        <tr> \
+            <th>IP</th> \
+            <th>hyphen</th> \
+            <th>userid</th> \
+            <th>Time Request</th> \
+        <th>Request Time</th> \
+        <th>Status Code</th> \
+        <th>Size Object</th> \
+        </tr>\
+    </thead> \
+    <tfoot> \
+        <tr> \
+            <th>IP</th> \
+            <th>hyphen</th> \
+            <th>userid</th>\
+            <th>Time Request</th> \
+        <th>Request Time</th> \
+        <th>Status Code</th> \
+        <th>Size Object</th> \
+        </tr>  \
+    </tfoot>  \
+        <tbody> \
+        </tbody> \
+    </table>'
+    '''
+    
+    return table
+
+
+def user():
+    """
+    exposes:
+    http://..../[app]/default/user/login
+    http://..../[app]/default/user/logout
+    http://..../[app]/default/user/register
+    http://..../[app]/default/user/profile
+    http://..../[app]/default/user/retrieve_password
+    http://..../[app]/default/user/change_password
+    use @auth.requires_login()
+        @auth.requires_membership('group name')
+        @auth.requires_permission('read','table name',record_id)
+    to decorate functions that need access control
+    """
+    return dict(form=auth())
+
+def error():
+    return dict()
+
+
+def project_manage():
+    
+    form = SQLFORM.smartgrid(db.t_project)
+    return locals()
+
+
+
+def server_manage():
+
+    form=SQLFORM.grid(db.t_server)
+    return locals()
+
+def log_manage():
+ 
+    #form = SQLFORM.smartgrid(db.t_log,constraints=dict(t_log=query), selectable=True,searchable=False, csv=False,showbuttontext=True,onupdate=auth.archive)
+    #form = SQLFORM.smartgrid(db.t_log)
+    form=SQLFORM.grid(db.t_log)
+    return locals()
+
+def type_log_manage():
+
+    form=SQLFORM.grid(db.t_type_log)
+    return locals()
+
+def download():
+    """
+    allows downloading of uploaded files
+    http://..../[app]/default/download/[filename]
+    """
+    return response.download(request,db)
+
+
+def call():
+    """
+    exposes services. for example:
+    http://..../[app]/default/call/jsonrpc
+    decorate with @services.jsonrpc the functions to expose
+    supports xml, json, xmlrpc, jsonrpc, amfrpc, rss, csv
+    """
+    return service()
+
+
+@auth.requires_signature()
+def data():
+    """
+    http://..../[app]/default/data/tables
+    http://..../[app]/default/data/create/[table]
+    http://..../[app]/default/data/read/[table]/[id]
+    http://..../[app]/default/data/update/[table]/[id]
+    http://..../[app]/default/data/delete/[table]/[id]
+    http://..../[app]/default/data/select/[table]
+    http://..../[app]/default/data/search/[table]
+    but URLs bust be signed, i.e. linked with
+      A('table',_href=URL('data/tables',user_signature=True))
+    or with the signed load operator
+      LOAD('default','data.load',args='tables',ajax=True,user_signature=True)
+    """
+    return dict(form=crud())

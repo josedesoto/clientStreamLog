@@ -1,0 +1,112 @@
+{{response.files.append(URL(r=request,c='static',f='css/demo_table.css'))}}
+{{response.files.append(URL(r=request,c='static',f='js/jquery.dataTables.min.js'))}}
+
+{{extend 'layout.html'}}
+
+<p>{{=form}}</p>
+
+<button id="button" data-role="button">START STREAMING</button>
+
+<br>
+<br>
+
+<table style="text-align: left; width: 60%;" >
+ <tr>
+        <td style="text-align: left; top; width: 30%;">
+		<a href="#nil" onclick="jQuery('#form1').slideToggle();" ><img border="0" align="botton" hspace="3" vspace="3" src="{{=URL(r=request,c='static',f='images/icon.gif')}}" alt=""></a> Select Log to connect
+	</td>
+	<td style="text-align: left; top; width: 30%;">
+		<a href="#nil" onclick="jQuery('#form2').slideToggle();" ><img border="0" align="botton" hspace="3" vspace="3" src="{{=URL(r=request,c='static',f='images/icon.gif')}}" alt=""></a> Type of log
+	</td>
+</tr>
+</table>
+
+
+<div id="form1" style="display: None">
+<br>
+	<div id="radio">
+		<input type="radio" id="radio1" name="radio" value="syslog"/><label for="radio1">Syslog</label>
+		<input type="radio" id="radio2" name="radio" value="joselog"/><label for="radio2">Jose Log</label>
+		<input type="radio" id="radio3" name="radio" value="xhtml"/><label for="radio3">Ubuntu server Log</label>
+	</div>
+</div>
+
+
+<div id="form2" style="display: None">
+<br>
+	<div id="radio_type_log">
+		<input type="radio" id="radio_type_log1" name="radio_type_log" /><label for="radio_type_log1">Apache Common Log Format</label>
+		<input type="radio" id="radio_type_log2" name="radio_type_log" /><label for="radio_type_log2">Combined Log Format</label>
+	</div>
+</div>
+
+<br>
+<br>
+<br>
+<div id="typetable"></div>
+
+
+
+ajax('ajaxwiki_onclick',['text'],'html')"
+
+
+<script>
+
+	function createStream(log_id)
+	{
+		
+		ajax('getTypeTable/'+log_id,[],'typetable')
+		jQuery.getJSON("{{=URL(r=request,f='',args=['','getConnectionData'])}}",
+        	function(json){
+          		
+		
+        		}
+		 );
+
+
+
+
+	}
+	
+
+        $("#button").click( function()
+           {
+             	var oTable;
+		oTable=$('#tablelog').dataTable( {
+		"sScrollY": "600px",
+        	"bPaginate": false,
+        	"bScrollCollapse": true
+					} );
+		oTable.fnSort( [ [0,'desc'] ] );
+
+		var params = $("input[name=radio]:checked").val();
+		alert(params);
+
+		var data;
+		web2py_comet('ws://95.142.163.184:8888/realtime/'+params,
+		function(e){
+			data=eval('('+oTable.fnAddData(e.data.split(" "))+')')
+	
+		});
+
+           });
+
+  	$(document).ready(function() {
+    		$("#radio").buttonset();
+  	});
+
+	$(document).ready(function() {
+    		$("#radio_type_log").buttonset();
+  	});
+
+	$("#radio_type_log").click(function()
+	{
+
+		ajax('type_table',[],'typetable');
+
+	});
+
+
+
+
+ </script>
