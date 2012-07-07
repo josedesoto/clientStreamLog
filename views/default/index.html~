@@ -29,14 +29,10 @@
 			name_log=json.name_log
 			ip=json.ip
 			port=json.port
-			var expression=json.regex
+			expression=json.regex
 			
-			
-	
-			alert(expression);
-			//alert('ws://'+ip+':'+port+'/realtime/'+name_log);
-			var regex = new RegExp(expression);	
-			alert(regex);	
+			regex = new RegExp(expression);	
+
 			web2py_comet('ws://'+ip+':'+port+'/realtime/'+name_log,
 			function(e){
 				data=eval('('+oTable.fnAddData(e.data.split(regex).slice(1, -1))+')')

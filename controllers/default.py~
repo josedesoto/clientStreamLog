@@ -10,17 +10,23 @@
 #########################################################################
 
 
-
+@auth.requires_login()
 def index():
     """
     example action using the internationalization operator T and flash
     rendered by views/default/index.html or views/generic.html
     """
-    links = [lambda row:  INPUT(_type='button',_value='START STREAM', _onclick='createStream('+str(row.id)+')')]
+    db.t_log.id.readable=False
+    db.t_log.server.readable=False
+    
+    db.t_log.type_log.readable=False
+    links = [lambda row:  INPUT(_type='button',_value='Load Table', _onclick='loadTable('+str(row.id)+')')]
+    links += [lambda row:  INPUT(_type='button',_value='START STREAM', _onclick='createStream('+str(row.id)+')')]
     form=SQLFORM.grid(db.t_log, selectable=False, csv=False,create=False, deletable=False, editable=False, links=links, user_signature=False)
     return dict(message=T('Hello World2'), form=form)
 
-@service.json
+'''
+@auth.requires_login()
 def getConnectionData():
     
     id_log=request.args[0]
@@ -35,22 +41,78 @@ def getConnectionData():
         port=row.t_server.port
         name_log=row.t_log.name
         
-    print ip
-    print port
-    print name_log
     
-	return response.json({"connection": [{'name_log': 'xhtml','IP': '127.0.0.1','port': '8888'}]})
+    regex=db((db.t_log.id==id_log)&(db.t_log.type_log==db.t_type_log.id)).select()
+    
+    regex_code=''
+    for row in regex:
+        regex_code=row.t_type_log.regex_code
+    
+    #return response.json([{'name_log': name_log,'IP': ip,'port': port,'regex': regex_code}])
+    return dict(name_log=name_log, ip=ip, port=port,regex=regex_code)
 
-def choose_log():
+'''
+
+
+
+
+@auth.requires_login()
+def getConnectionData():
+    
+    id_log=request.args[0]
+    ip=''
+    port=''
+    name_log=''
+    server=''
+    
+    t_log=db(db.t_log.id==id_log).select(db.t_log.server,db.t_log.name)
+    for row in t_log:
+        server=row.server
+        name_log=row.name
+                       
+    data_connection=db(db.t_server.id==server).select(db.t_server.IP,db.t_server.port)
+  
+    for row in data_connection:
+        ip=row.IP
+        port=row.port
+        
+    
+    t_log=db(db.t_log.id==id_log).select(db.t_log.type_log)
+    for row in t_log:
+        type_log=row.type_log
+        
+    regex=db(db.t_type_log.id==type_log).select(db.t_type_log.regex_code)
+    
+    regex_code=''
+    for row in regex:
+        regex_code=row.regex_code
+    
+    #return response.json([{'name_log': name_log,'IP': ip,'port': port,'regex': regex_code}])
+    return dict(name_log=name_log, ip=ip, port=port,regex=regex_code)
+
+
+@auth.requires_login()
+def getTypeTable():
     """
     example action using the internationalization operator T and flash
     rendered by views/default/index.html or views/generic.html
     """
+    table=''
+    id_log=request.args[0]
+    t_log=db(db.t_log.id==id_log).select(db.t_log.type_log)
+    for row in t_log:
+        type_log=row.type_log
+        
+    type_table=db(db.t_type_log.id==type_log).select(db.t_type_log.html_table)
     
+    for row in type_table:
+        table=row.html_table
+        
     
-    return dict(message="log")
+    return table
 
-
+'''
+@auth.requires_login()
 def getTypeTable():
     """
     example action using the internationalization operator T and flash
@@ -62,37 +124,9 @@ def getTypeTable():
     for row in type_table:
         table=row.html_table
         
-    '''
-    table='<table cellpadding="0" cellspacing="0" border="0" class="display" id="tablelog"> \
-    <thead> \
-        <tr> \
-            <th>IP</th> \
-            <th>hyphen</th> \
-            <th>userid</th> \
-            <th>Time Request</th> \
-        <th>Request Time</th> \
-        <th>Status Code</th> \
-        <th>Size Object</th> \
-        </tr>\
-    </thead> \
-    <tfoot> \
-        <tr> \
-            <th>IP</th> \
-            <th>hyphen</th> \
-            <th>userid</th>\
-            <th>Time Request</th> \
-        <th>Request Time</th> \
-        <th>Status Code</th> \
-        <th>Size Object</th> \
-        </tr>  \
-    </tfoot>  \
-        <tbody> \
-        </tbody> \
-    </table>'
-    '''
     
     return table
-
+'''
 
 def user():
     """
@@ -108,34 +142,38 @@ def user():
         @auth.requires_permission('read','table name',record_id)
     to decorate functions that need access control
     """
+    #auth.settings.actions_disabled.append('register')
+    auth.settings.actions_disabled.append('request_reset_password')
     return dict(form=auth())
 
 def error():
     return dict()
 
 
+@auth.requires_login()
 def project_manage():
     
-    form = SQLFORM.smartgrid(db.t_project)
+    form = SQLFORM.smartgrid(db.t_project,csv=False)
     return locals()
 
-
-
+@auth.requires_login()
 def server_manage():
 
-    form=SQLFORM.grid(db.t_server)
+    form=SQLFORM.grid(db.t_server,csv=False)
     return locals()
 
+@auth.requires_login()
 def log_manage():
  
     #form = SQLFORM.smartgrid(db.t_log,constraints=dict(t_log=query), selectable=True,searchable=False, csv=False,showbuttontext=True,onupdate=auth.archive)
     #form = SQLFORM.smartgrid(db.t_log)
-    form=SQLFORM.grid(db.t_log)
+    form=SQLFORM.grid(db.t_log,csv=False)
     return locals()
 
+@auth.requires_login()
 def type_log_manage():
 
-    form=SQLFORM.grid(db.t_type_log)
+    form=SQLFORM.grid(db.t_type_log,csv=False)
     return locals()
 
 def download():

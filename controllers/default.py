@@ -10,7 +10,7 @@
 #########################################################################
 
 
-@auth.requires_login()
+#@auth.requires_login()
 def index():
     """
     example action using the internationalization operator T and flash
@@ -56,7 +56,7 @@ def getConnectionData():
 
 
 
-@auth.requires_login()
+#@auth.requires_login()
 def getConnectionData():
     
     id_log=request.args[0]
@@ -91,7 +91,7 @@ def getConnectionData():
     return dict(name_log=name_log, ip=ip, port=port,regex=regex_code)
 
 
-@auth.requires_login()
+#@auth.requires_login()
 def getTypeTable():
     """
     example action using the internationalization operator T and flash
@@ -150,19 +150,19 @@ def error():
     return dict()
 
 
-@auth.requires_login()
+#@auth.requires_login()
 def project_manage():
     
     form = SQLFORM.smartgrid(db.t_project,csv=False)
     return locals()
 
-@auth.requires_login()
+#@auth.requires_login()
 def server_manage():
 
     form=SQLFORM.grid(db.t_server,csv=False)
     return locals()
 
-@auth.requires_login()
+#@auth.requires_login()
 def log_manage():
  
     #form = SQLFORM.smartgrid(db.t_log,constraints=dict(t_log=query), selectable=True,searchable=False, csv=False,showbuttontext=True,onupdate=auth.archive)
@@ -170,7 +170,7 @@ def log_manage():
     form=SQLFORM.grid(db.t_log,csv=False)
     return locals()
 
-@auth.requires_login()
+#@auth.requires_login()
 def type_log_manage():
 
     form=SQLFORM.grid(db.t_type_log,csv=False)
@@ -194,7 +194,7 @@ def call():
     return service()
 
 
-@auth.requires_signature()
+#@auth.requires_signature()
 def data():
     """
     http://..../[app]/default/data/tables
