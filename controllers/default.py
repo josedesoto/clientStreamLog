@@ -144,6 +144,7 @@ def user():
     """
     auth.settings.actions_disabled.append('register')
     auth.settings.actions_disabled.append('request_reset_password')
+    auth.settings.actions_disabled.append('login')
     return dict(form=auth())
 
 def error():
@@ -153,13 +154,13 @@ def error():
 #@auth.requires_login()
 def project_manage():
     
-    form = SQLFORM.smartgrid(db.t_project,csv=False)
+    form = SQLFORM.smartgrid(db.t_project,csv=False,user_signature = False)
     return locals()
 
 #@auth.requires_login()
 def server_manage():
 
-    form=SQLFORM.grid(db.t_server,csv=False)
+    form=SQLFORM.grid(db.t_server,csv=False, user_signature = False)
     return locals()
 
 #@auth.requires_login()
@@ -167,13 +168,13 @@ def log_manage():
  
     #form = SQLFORM.smartgrid(db.t_log,constraints=dict(t_log=query), selectable=True,searchable=False, csv=False,showbuttontext=True,onupdate=auth.archive)
     #form = SQLFORM.smartgrid(db.t_log)
-    form=SQLFORM.grid(db.t_log,csv=False)
+    form=SQLFORM.grid(db.t_log,csv=False,user_signature = False)
     return locals()
 
 #@auth.requires_login()
 def type_log_manage():
 
-    form=SQLFORM.grid(db.t_type_log,csv=False)
+    form=SQLFORM.grid(db.t_type_log,csv=False,user_signature = False)
     return locals()
 
 def download():
