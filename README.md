@@ -36,6 +36,9 @@ with the defined server log.
 5 - Open the URL: http://localhost:8000/clientStreamLog
 
 
+NOTE: For more info about the server part: https://github.com/josedesoto/serverStreamLog
+
+
 ## Demo in GAE
 
 http://streamlogs.appspot.com/streamlog/default/index
