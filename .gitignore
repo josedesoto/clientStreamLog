@@ -1,0 +1,7 @@
+# Files exclude
+*.pyc
+*~
+# Folders exclude
+errors/
+cache/
+sessions/

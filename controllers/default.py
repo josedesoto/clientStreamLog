@@ -65,27 +65,19 @@ def getConnectionData():
     name_log=''
     server=''
     
-    t_log=db(db.t_log.id==id_log).select(db.t_log.server,db.t_log.name)
-    for row in t_log:
-        server=row.server
-        name_log=row.name
+    row_log=db(db.t_log.id==id_log).select(db.t_log.server,db.t_log.name,db.t_log.type_log)[0]
+    server=row_log.server
+    name_log=row_log.name
+    type_log=row_log.type_log	
                        
-    data_connection=db(db.t_server.id==server).select(db.t_server.IP,db.t_server.port)
+    data_connection=db(db.t_server.id==server).select(db.t_server.IP,db.t_server.port)[0]
+    ip=data_connection.IP
+    port=data_connection.port 
+    
+        
+    regex=db(db.t_type_log.id==type_log).select(db.t_type_log.regex_code)[0]
+    regex_code=regex.regex_code
   
-    for row in data_connection:
-        ip=row.IP
-        port=row.port
-        
-    
-    t_log=db(db.t_log.id==id_log).select(db.t_log.type_log)
-    for row in t_log:
-        type_log=row.type_log
-        
-    regex=db(db.t_type_log.id==type_log).select(db.t_type_log.regex_code)
-    
-    regex_code=''
-    for row in regex:
-        regex_code=row.regex_code
     
     #return response.json([{'name_log': name_log,'IP': ip,'port': port,'regex': regex_code}])
     return dict(name_log=name_log, ip=ip, port=port,regex=regex_code)
@@ -99,17 +91,11 @@ def getTypeTable():
     """
     table=''
     id_log=request.args[0]
-    t_log=db(db.t_log.id==id_log).select(db.t_log.type_log)
-    for row in t_log:
-        type_log=row.type_log
+    row_log=db(db.t_log.id==id_log).select(db.t_log.type_log)[0]
         
-    type_table=db(db.t_type_log.id==type_log).select(db.t_type_log.html_table)
-    
-    for row in type_table:
-        table=row.html_table
-        
-    
-    return table
+    type_table=db(db.t_type_log.id==row_log.type_log).select(db.t_type_log.html_table)[0]
+       
+    return type_table.html_table
 
 '''
 @auth.requires_login()
