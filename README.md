@@ -1,14 +1,4 @@
-"""
-
-clientStreamLog - Client Stream log
-
-Copyright (C) 2012  Jose de Soto <josedesoto@gmail.com>
-
-License: LGPLv3 (http://www.gnu.org/licenses/lgpl.html)
-
-"""
-
-Description: 
+## Description: 
 Stream log client developed with web2py code framework. This web client opens a single persistent connection 
 with the defined server log.
 
@@ -43,3 +33,14 @@ NOTE: For more info about the server part: https://github.com/josedesoto/serverS
 ## Demo in GAE
 
 http://streamlogs.appspot.com/streamlog/default/index
+
+
+"""
+
+clientStreamLog - Client Stream log
+
+Copyright (C) 2012  Jose de Soto <josedesoto@gmail.com>
+
+License: LGPLv3 (http://www.gnu.org/licenses/lgpl.html)
+
+"""
